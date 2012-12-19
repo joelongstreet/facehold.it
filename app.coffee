@@ -12,7 +12,7 @@ face_job    = require './face_job'
 
 port        = process.env.PORT || 3000
 env         = process.env.environment || 'development'
-app         = express.createServer()
+app         = express()
 
 
 # --> Config 

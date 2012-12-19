@@ -1,29 +1,58 @@
 {
   "name": "faceholdit",
-  "version": "1.0.0-38",
+  "version": "1.0.0-46",
   "dependencies": {
     "express": {
-      "version": "2.5.8",
+      "version": "3.0.0rc4",
       "dependencies": {
         "connect": {
-          "version": "1.9.2",
+          "version": "2.4.4",
           "dependencies": {
-            "mime": {
-              "version": "1.2.7"
+            "qs": {
+              "version": "0.4.2"
             },
             "formidable": {
               "version": "1.0.11"
+            },
+            "bytes": {
+              "version": "0.1.0"
+            },
+            "pause": {
+              "version": "0.0.1"
             }
           }
         },
-        "mime": {
-          "version": "1.2.4"
+        "commander": {
+          "version": "0.6.1"
         },
-        "qs": {
-          "version": "0.4.2"
+        "range-parser": {
+          "version": "0.0.4"
         },
         "mkdirp": {
-          "version": "0.3.0"
+          "version": "0.3.3"
+        },
+        "cookie": {
+          "version": "0.0.4"
+        },
+        "crc": {
+          "version": "0.2.0"
+        },
+        "fresh": {
+          "version": "0.1.0"
+        },
+        "methods": {
+          "version": "0.0.1"
+        },
+        "send": {
+          "version": "0.0.4",
+          "dependencies": {
+            "mime": {
+              "version": "1.2.6"
+            }
+          }
+        },
+        "debug": {
+          "version": "0.7.0"
         }
       }
     },

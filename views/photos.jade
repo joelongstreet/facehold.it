@@ -1,4 +1,7 @@
-#photos
-    each photo in photos
-        a(target="blank", href="http://facebook.com/#{photo}")
-            img(src= "https://s3.amazonaws.com/faceholder/#{photo}.jpg")
+extends layout
+
+block content
+    #photos
+        each photo in photos
+            a(target="blank", href="http://facebook.com/#{photo}")
+                img(src= "https://s3.amazonaws.com/faceholder/#{photo}.jpg")
