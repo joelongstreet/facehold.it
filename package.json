@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-46",
+  "version": "1.0.0-47",
   "engines": {
     "node": "0.8.x",
     "npm": "1.1.48"
@@ -19,10 +19,6 @@
   "scripts": {
     "start": "runner.js"
   },
-  "domains": [
-    "facehold.it",
-    "www.facehold.it"
-  ],
   "name": "faceholdit",
-  "subdomain": "facehold.it.cremalab"
+  "subdomain": "faceholdit"
 }
