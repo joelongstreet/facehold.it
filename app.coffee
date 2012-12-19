@@ -55,8 +55,11 @@ make_photo_url = (max, next) ->
 # --> How many photos do I have...
 get_photo_count = (next) ->
     redis_client.llen 'friends', (err, res) ->
-        if err then console.error "could not get record length from database #{err}"
-        else next(res)
+        console.log "I currently have #{res} photos for you to choose from"
+        if err
+            console.error "could not get record length from database #{err}"
+        else 
+            if next then next(res)
 # --> End
 
 
@@ -115,17 +118,18 @@ app.get '/:number', (req, res, next) ->
         photo_urls  = []
         index       = 0
 
-        get_photo_count (photo_count) ->
-
-            emitter = new emitter()
-            emitter.once 'ready', ->
+        get_photo_count (photo_count) =>
+            is_ready = new emitter()
+            is_ready.once 'ready', ->
                 res.render 'photos', photos : photo_urls
 
             while index < req.params.number
+
                 make_photo_url photo_count, (id) ->
                     photo_urls.push id
+
                     if photo_urls.length == req.params.number - 1
-                        emitter.emit 'ready'
+                        is_ready.emit 'ready'
 
                 index++
 
