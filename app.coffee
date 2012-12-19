@@ -6,110 +6,80 @@ stylus      = require 'stylus'
 http        = require 'http'
 request     = require 'request'
 redis       = require 'redis'
-knox        = require 'knox'
 bootstrap   = require 'bootstrap-stylus'
-app         = express.createServer()
+emitter     = require('events').EventEmitter
+face_job    = require './face_job'
+
 port        = process.env.PORT || 3000
 env         = process.env.environment || 'development'
-fb_int      = 3000
+app         = express.createServer()
 
-if env == 'development' then fb_int = 3000
 
+# --> Config 
 app.use require('connect-assets')()
+app.use express.static path.join __dirname, 'public'
     
 app.set 'views', path.join __dirname, 'views'
 app.set 'view engine', 'jade'
+# --> End Config
 
-app.use express.static path.join __dirname, 'public'
 
+
+# --> Go Get Facebook Photos every 3 seconds
+get_photo_int   = 0
 redis_client    = redis.createClient(2586, '50.30.35.9')
 
 redis_client.auth process.env.REDIS_PASS, (err) ->
     if err then console.error "#{err} could not authenticate with redis"
     if env != 'production'
-        get_photo_int = setInterval (-> build_fb_photo() ), fb_int
-
-knox_client     = knox.createClient
-    key         : process.env.S3_KEY
-    secret      : process.env.S3_SECRET
-    bucket      : 'faceholder'
-
-get_photo_int   = 0
-
-build_fb_photo  = ->
-    rando       = Math.floor(Math.random() * 1000000000) + 1
-    fb_req      = "https://graph.facebook.com/#{rando}/picture?type=large"
-
-    request
-        method  : 'GET'
-        url     : fb_req
-        timeout : 1500
-    , (err, resp, body) ->
-
-        if err then console.error 'rate limiting from facebook.'
-
-        if resp
-            image_path = resp.socket.pair.cleartext._httpMessage.path
-
-            if image_path == '/static-ak/rsrc.php/v2/yL/r/HsTZSDw4avx.gif' || image_path == '/static-ak/rsrc.php/v2/yp/r/yDnr5YfbJCH.gif'
-                return false
-            else
-                piped = request("https://fbcdn-profile-a.akamaihd.net/#{image_path}").pipe(fs.createWriteStream("#{__dirname}/public/fb_images/#{rando}.jpg"))
-                piped.on 'error', (pipe_err) ->
-                    console.error 'could not write photo from facebook to file system'
-                    console.error pipe_err
-                piped.on 'close', ->
-                    random = "#{rando}.jpg"
-
-                    knox_client.putFile piped.path, random, (err, res) ->
-                        if err
-                            console.error 'error writing to s3 server'
-                            console.error err
-                        else
-                            fs.unlink "#{__dirname}/public/fb_images/#{rando}.jpg", (delete_err) ->
-                                if delete_err
-                                    console.error 'could not clean up file'
-                                    console.error delete_err
-                            redis_client.lpush 'friends', rando, (redis_err, redis_res) ->
-                                if redis_err
-                                    console.error 'could not write to remote redis server'
-                                    console.error redis_err
+        get_photo_int = setInterval (-> 
+            face_job (rando) ->
+                redis_client.lpush 'friends', rando, (redis_err, redis_res) ->
+                    if redis_err then console.error 'could not write to remote redis server', redis_err
+                    else console.log "Successfully stole another FB Photo #{rando}"
+        ), 3000
+# -->
 
 
-get_photo_url = (max, index, next) ->
+
+# --> Make a photo random photo url
+make_photo_url = (max, next) ->
     rando = Math.floor(Math.random() * max)
     redis_client.lindex 'friends', rando, (err, res) ->
         if err then console.error "could not find record in database #{err}"
-        else next(res, index)
+        else next(res)
+# --> End
 
 
+
+# --> How many photos do I have...
 get_photo_count = (next) ->
     redis_client.llen 'friends', (err, res) ->
         if err then console.error "could not get record length from database #{err}"
         else next(res)
+# --> End
 
 
 
 app.get '/', (req, res, next) ->
-    if req.headers.referrer
-        res.redirect '/pic'
-    else
-        res.redirect '/25'
+    if req.headers.referrer then res.redirect '/pic'
+    else res.redirect '/25'
 
 
-    
 app.get '/pic', (req, res, next) ->
     get_photo_count (photo_count) ->
-        get_photo_url photo_count, 0, (url, index) ->
-            res.redirect "https://s3.amazonaws.com/faceholder/#{url}.jpg"
+        make_photo_url photo_count, (id) ->
+            res.redirect "https://s3.amazonaws.com/faceholder/#{id}.jpg"
 
 
 
+# Convert af_ZA to Afrikaans, az_AZ to Azerbaijani.. etc.
 fb_locales = JSON.parse(fs.readFileSync('./fb_locales.js','utf-8'))
 
+# --> Hubot script to serve random people
 app.get '/hubot', (req, res, next) ->
     get_photo_count (photo_count) ->
-        get_photo_url photo_count, 0, (id, index) ->
+        make_photo_url photo_count, (id) ->
 
             fb_req      = "https://graph.facebook.com/#{id}"
 
@@ -126,8 +96,6 @@ app.get '/hubot', (req, res, next) ->
                     if location.fb_code == fb_body.locale
                         locale = location.nationality
 
-                console.log fb_body
-
                 res.send
                     id          : fb_body.id
                     name        : fb_body.name
@@ -135,7 +103,7 @@ app.get '/hubot', (req, res, next) ->
                     url         : fb_body.link
                     nationality : locale
                     image       : "https://s3.amazonaws.com/faceholder/#{id}.jpg"
-
+# --> End
 
 
 app.get '/:number', (req, res, next) ->
@@ -145,17 +113,21 @@ app.get '/:number', (req, res, next) ->
 
     else
         photo_urls  = []
-        i           = 0
+        index       = 0
 
         get_photo_count (photo_count) ->
 
-            while i < req.params.number
-                get_photo_url photo_count, i, (url, index) ->
-                    photo_urls.push url
+            emitter = new emitter()
+            emitter.once 'ready', ->
+                res.render 'photos', photos : photo_urls
 
-                    if index == parseInt(req.params.number - 1)
-                        res.render 'photos', photos : photo_urls
-                i++
+            while index < req.params.number
+                make_photo_url photo_count, (id) ->
+                    photo_urls.push id
+                    if photo_urls.length == req.params.number - 1
+                        emitter.emit 'ready'
+
+                index++
 
 
 app.listen port
