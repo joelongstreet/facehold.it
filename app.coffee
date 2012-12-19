@@ -9,7 +9,7 @@ redis       = require 'redis'
 knox        = require 'knox'
 bootstrap   = require 'bootstrap-stylus'
 app         = express.createServer()
-port        = process.env.PORT || 3001
+port        = process.env.PORT || 3000
 env         = process.env.environment || 'development'
 fb_int      = 3000
 
