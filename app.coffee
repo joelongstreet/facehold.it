@@ -1,4 +1,3 @@
-#517885548
 express     = require 'express'
 path        = require 'path'
 fs          = require 'fs'
@@ -31,8 +30,8 @@ redis_client    = redis.createClient(2586, '50.30.35.9')
 redis_client.auth process.env.REDIS_PASS, (err) ->
 
     fb_photos = new FBPhotos(redis_client)
-    console.log 'redis authed'
-    if env != 'production'
+
+    if process.env.GETPHOTOS is true
         # Go Get Facebook Photos every 3 seconds
         get_photo_int   = 0
         get_photo_int = setInterval (-> 

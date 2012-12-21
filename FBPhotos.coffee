@@ -38,7 +38,7 @@ class exports.FBPhotos
     save_facebook_photo : (user_id, fb_image_path, next) ->
 
         # Write photo to disk
-        piped = request("https://fbcdn-profile-a.akamaihd.net/#{fb_image_path}").pipe(fs.createWriteStream("#{__dirname}/public/fb_images/#{user_id}.jpg"))
+        piped = request("https://fbcdn-profile-a.akamaihd.net/#{fb_image_path}").pipe(fs.createWriteStream("#{__dirname}/public/img/#{user_id}.jpg"))
         piped.on 'error', (pipe_err) =>
             console.error 'could not write photo from facebook to file system', pipe_err
 
@@ -48,7 +48,7 @@ class exports.FBPhotos
                 if err then console.error 'error writing to s3 server', err
                 
                 # Delete the file From disk
-                fs.unlink "#{__dirname}/public/fb_images/#{user_id}.jpg", (delete_err) ->
+                fs.unlink "#{__dirname}/public/img/#{user_id}.jpg", (delete_err) ->
                     if delete_err then console.error 'could not clean up file', delete_err
 
                 # Let Redis know we got a new one for it
