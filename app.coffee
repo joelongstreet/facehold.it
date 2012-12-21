@@ -1,18 +1,19 @@
+#517885548
 express     = require 'express'
 path        = require 'path'
 fs          = require 'fs'
-util        = require 'util'
 stylus      = require 'stylus'
-http        = require 'http'
 request     = require 'request'
 redis       = require 'redis'
 bootstrap   = require 'bootstrap-stylus'
 emitter     = require('events').EventEmitter
-face_job    = require './face_job'
+{FBPhotos}  = require './FBPhotos'
 
 port        = process.env.PORT || 3000
 env         = process.env.environment || 'development'
 app         = express()
+
+fb_photos   = null
 
 
 # --> Config 
@@ -25,18 +26,18 @@ app.set 'view engine', 'jade'
 
 
 
-# --> Go Get Facebook Photos every 3 seconds
-get_photo_int   = 0
+# --> Auth with Redois
 redis_client    = redis.createClient(2586, '50.30.35.9')
-
 redis_client.auth process.env.REDIS_PASS, (err) ->
-    if err then console.error "#{err} could not authenticate with redis"
+
+    fb_photos = new FBPhotos(redis_client)
+    console.log 'redis authed'
     if env != 'production'
+        # Go Get Facebook Photos every 3 seconds
+        get_photo_int   = 0
         get_photo_int = setInterval (-> 
-            face_job (rando) ->
-                redis_client.lpush 'friends', rando, (redis_err, redis_res) ->
-                    if redis_err then console.error 'could not write to remote redis server', redis_err
-                    else console.log "Successfully stole another FB Photo #{rando}"
+            rando = Math.floor(Math.random() * 1000000000) + 1
+            fb_photos.create_photo rando, ->
         ), 3000
 # -->
 
@@ -132,6 +133,14 @@ app.get '/:number', (req, res, next) ->
                         is_ready.emit 'ready'
 
                 index++
+
+
+app.get '/add/:fbid', (req, res) ->
+    fb_photos.create_photo req.params.fbid, (err, data) ->
+        if err
+            res.render 'error', {error : err}
+        else
+            res.render 'new_user_added', { uid : data.user_id, path : data.as3_path }
 
 
 app.listen port
