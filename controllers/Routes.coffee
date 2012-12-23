@@ -1,8 +1,10 @@
 request     = require 'request'
 fs          = require 'fs'
 events      = require 'events'
+analytics   = require 'nodealytics'
 {Facebook}  = require './Facebook'
 {Photos}    = require './Photos'
+
 
 class exports.Routes
 
@@ -10,18 +12,17 @@ class exports.Routes
         @facebook   = new Facebook @redis_client
         @photos     = new Photos @redis_client
         @fb_locales = JSON.parse(fs.readFileSync('./data/fb_locales.js','utf-8'))
+        @analytics  = analytics.initialize 'UA-3920837-11', 'faceholdit.jit.su'
 
 
     home        : (req, res) =>
-        count = @photos.count (how_many) ->
-            console.log how_many
         if req.headers.referrer then res.redirect '/pic'
         else res.redirect '/25'
 
 
     pic         : (req, res) =>
         @photos.count (count) =>
-            @photos.make_url count, (id) =>
+            @photos.make_random_url count, (id) =>
                 res.redirect "https://s3.amazonaws.com/faceholder/#{id}.jpg"
 
 
@@ -46,28 +47,34 @@ class exports.Routes
     number      : (req, res) =>
         if req.params.number > 100
             res.render 'max'
-        else if req.params.number == '1'
-            res.redirect '/pic'
         else
             photo_urls  = []
             index       = 0
-            @photos.count (count) =>
+            @photos.count (err, count) =>
                 is_ready = new events.EventEmitter()
                 is_ready.once 'ready', ->
                     res.render 'photos', photos : photo_urls
 
                 while index < req.params.number
-                    @photos.make_url count, (id) ->
-                        photo_urls.push id
+                    @photos.make_random_url count, (err, id) ->
+                        if err then console.log 'error fetching photo'
+                        else photo_urls.push id
+
                         if photo_urls.length == req.params.number - 1
                             is_ready.emit 'ready'
 
                     index++
 
 
+    get_user        : (req, res) =>
+        @photos.make_url req.params.id, (err, id) =>
+            if err then res.render 'error', {error : err}
+            else res.redirect "https://s3.amazonaws.com/faceholder/#{id}.jpg"
+
+
     hubot       : (req, res) =>
         @photos.count (count) =>
-            @photos.make_url count, (id) =>
+            @photos.make_random_url count, (id) =>
 
                 fb_req      = "https://graph.facebook.com/#{id}"
 

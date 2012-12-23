@@ -40,8 +40,7 @@ app.get '/hubot', routes.hubot
 app.get '/:number', routes.number
 app.get '/add/me', routes.add_me
 app.get '/add/:fbid', routes.add_user
-
-
+app.get '/user/:id', routes.get_user
 
 app.listen port
 console.log "server running on port #{port} in #{env} environment"
