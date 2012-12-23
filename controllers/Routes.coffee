@@ -21,9 +21,14 @@ class exports.Routes
 
 
     pic         : (req, res) =>
-        @photos.count (count) =>
-            @photos.make_random_url count, (id) =>
-                res.redirect "https://s3.amazonaws.com/faceholder/#{id}.jpg"
+        @photos.count (err, count) =>
+            if err then res.render 'error', {error : err}
+            else
+                @photos.make_random_url count, (err, id) =>
+                    if err then res.render 'error', {error : err}
+                    else
+                        @analytics.trackPage 'Picture', 'picture'
+                        res.redirect "https://s3.amazonaws.com/faceholder/#{id}.jpg"
 
 
     add_user    : (req, res) =>
