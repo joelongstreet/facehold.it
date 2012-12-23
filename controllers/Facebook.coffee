@@ -54,14 +54,13 @@ class exports.Facebook
 
                 # Let Redis know we got a new one for it
                 @redis_client.lpush 'friends', user_id, (redis_err, redis_res) ->
-                    if redis_err then console.error 'could not write to remote redis server', redis_err
-                    else console.log "Successfully borrowed another FB Photo #{user_id}"
-
+                    if redis_err
+                        next("could not write to remote redis server, #{redis_err}")
                     data =
                         user_id     : user_id
                         as3_path    : "https://s3.amazonaws.com/faceholder/#{user_id}.jpg"
 
-                    if next then next(null, data)
+                    if next then next(false, data)
 
 
     get_token : (next) ->
@@ -77,4 +76,5 @@ class exports.Facebook
         me_url = "https://graph.facebook.com/me?access_token=#{encodeURIComponent(token)}"
         request.get me_url, (err, res, body) ->
             response = JSON.parse(body)
-            next(user.id)
+            console.log body
+            next(response.id)

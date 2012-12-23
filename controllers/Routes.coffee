@@ -72,14 +72,12 @@ class exports.Routes
 
 
     get_user        : (req, res) =>
-        @photos.make_url req.params.id, (err, id) =>
-            if err then res.render 'error', {error : err}
-            else res.redirect "https://s3.amazonaws.com/faceholder/#{id}.jpg"
+        res.redirect "https://s3.amazonaws.com/faceholder/#{req.params.id}.jpg"
 
 
     hubot       : (req, res) =>
-        @photos.count (count) =>
-            @photos.make_random_url count, (id) =>
+        @photos.count (err, count) =>
+            @photos.make_random_url count, (err, id) =>
 
                 fb_req      = "https://graph.facebook.com/#{id}"
 

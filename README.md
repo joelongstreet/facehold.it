@@ -11,6 +11,5 @@ Refresh the page untill you see what you want, then copy the direct link or grab
 * `npm install` to install dependencies.
 * `S3_KEY=... S3_SECRET=... REDIS_PASS=... node runner.js` to run the application. If you'd like to use my s3 info and redis stuff just let me know.
 
-## New Features
-
-## Analytics Goals
+## ToDo
+* add/me route does not work, for some reason facebook is rejecting the access_token. Fucking facebook.
