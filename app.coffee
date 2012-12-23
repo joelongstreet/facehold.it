@@ -3,7 +3,7 @@ path        = require 'path'
 stylus      = require 'stylus'
 redis       = require 'redis'
 bootstrap   = require 'bootstrap-stylus'
-{Routes}    = require './controllers/routes'
+{Routes}    = require './controllers/Routes'
 
 port        = process.env.PORT || 3000
 env         = process.env.environment || 'development'
