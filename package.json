@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-52",
+  "version": "1.0.0-68",
   "engines": {
     "node": "0.8.x",
     "npm": "1.1.48"
@@ -14,7 +14,9 @@
     "redis": "v0.7.2",
     "knox": "v0.0.9",
     "bootstrap-stylus": "v0.2.1",
-    "nib": "v0.8.1"
+    "nib": "v0.8.1",
+    "nodealytics": "https://github.com/skookum/nodealytics/tarball/master",
+    "nodefly" : "stable"
   },
   "scripts": {
     "start": "runner.js"
