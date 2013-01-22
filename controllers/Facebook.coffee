@@ -44,6 +44,7 @@ class exports.Facebook
             console.error 'could not write photo from facebook to file system', pipe_err
 
         # Save photo to database
+        console.log 'borrowed another facebook photo!!!'
         piped.on 'close', =>
             knox_client.putFile piped.path, "#{user_id}.jpg", (err, res) =>
                 if err then console.error 'error writing to s3 server', err
