@@ -4,10 +4,12 @@ request             = require 'request'
 path                = require 'path'
 as3_bucket          = 'faceholder'
 local_photo_path    = "#{path.dirname(process.mainModule.filename)}/public/img"
+###
 knox_client         = knox.createClient
     key                 : process.env.S3_KEY
     secret              : process.env.S3_SECRET
     bucket              : as3_bucket
+###
 
 
 class exports.Facebook
