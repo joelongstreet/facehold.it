@@ -2,7 +2,6 @@ express     = require 'express'
 path        = require 'path'
 redis       = require 'redis'
 {Routes}    = require './controllers/Routes'
-{FB}        = require './controllers/Facebook'
 
 port        = process.env.PORT || 3000
 env         = process.env.environment || 'development'

@@ -14,7 +14,4 @@ Refresh the page untill you see what you want, then copy the direct link or grab
 ## ToDo
 * add/me route does not work, for some reason facebook is rejecting the access_token. Fucking facebook.
 
-* Use regular bootstrap, not a node module
-* Remove nodefly
-* Update nodealytics
 * Convert to Couch
