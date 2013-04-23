@@ -1,16 +1,15 @@
-request     = require 'request'
-fs          = require 'fs'
-events      = require 'events'
-analytics   = require 'nodealytics'
-{Facebook}  = require './Facebook'
-{Photos}    = require './Photos'
-
+request         = require 'request'
+fs              = require 'fs'
+events          = require 'events'
+analytics       = require 'nodealytics'
+{Facebook}      = require './Facebook'
+{PhotoUtils}    = require './Photos'
 
 class exports.Routes
 
-    constructor : (@redis_client) ->
-        @facebook   = new Facebook @redis_client
-        @photos     = new Photos @redis_client
+    constructor : ->
+        @facebook   = new Facebook()
+        @photos     = new PhotoUtils()
         @fb_locales = JSON.parse(fs.readFileSync('./data/fb_locales.js','utf-8'))
         @analytics  = analytics.initialize 'UA-3920837-11', 'faceholdit.jit.su'
 

@@ -14,7 +14,8 @@
     "knox": "v0.0.9",
     "nib": "v0.8.1",
     "nodealytics": "v0.0.4",
-    "nano": "v3.3.8"
+    "nano": "v3.3.8",
+    "should": "~1.2.2"
   },
   "scripts": {
     "start": "runner.js"
