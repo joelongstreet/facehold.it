@@ -37,9 +37,8 @@ var makeRandomPhoto = function(next){
 };
 
 var saveToAS3 = function(fbObj, next){
-    var fbImageBasePath     = 'https://fbcdn-profile-a.akamaihd.net';
     var localFbPhotoPath    = localPhotos + fbObj.userId + '.jpg';
-    var piped               = request(fbImageBasePath + fbObj.url).pipe(fs.createWriteStream(localFbPhotoPath));
+    var piped               = request(fbObj.url).pipe(fs.createWriteStream(localFbPhotoPath));
 
     piped.on('close', function(){
         var imageName = fbObj.userId + '.jpg';

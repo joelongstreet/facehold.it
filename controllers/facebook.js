@@ -36,11 +36,11 @@ var steal = function(userId, next){
         } else if (res) {
             next({
                 userId  : userId,
-                url     : res.socket.pair.cleartext._httpMessage.path
+                url     : 'https://fbcdn-profile-a.akamaihd.net' + res.socket.pair.cleartext._httpMessage.path
             });
         }
     });
 };
 
-exports.getToken = getToken;
-exports.steal = steal;
+exports.getToken    = getToken;
+exports.steal       = steal;

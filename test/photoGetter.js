@@ -15,9 +15,10 @@ describe('Photo Getter', function(){
         });
     });
 
-    it.skip('should return objects with urls and tags', function(){
+    it('should return objects with urls and tags', function(){
         for(var i=0; i<photoObjects.length; i++){
-            photoObjects[i].should.have.property('url');
+            photoObjects[i].should.have.property('fbUrl');
+            photoObjects[i].should.have.property('as3Url');
             photoObjects[i].should.have.property('tags');
         }
     });
