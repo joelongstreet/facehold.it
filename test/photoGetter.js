@@ -6,6 +6,7 @@ describe('Photo Getter', function(){
 
     var photoObjects = []
     it('should return an array with a length matching the first argument', function(done){
+        this.timeout(5000);
         var argLength = 5;
         photoGetter.getSome(argLength, function(records){
             photoObjects = records;
