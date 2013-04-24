@@ -15,11 +15,13 @@ var getToken = function(next){
     });
 };
 
-var getMyId = function(token, next){
-    var meUrl = 'https://graph.facebook.com/me?access_token=' + encodeURIComponent(token);
-    request.get(meUrl, function(err, res, body){
-        response = JSON.parse(body);
-        next(response.id)
+var getMyId = function(next){
+    getToken(function(token){
+        var meUrl = 'https://graph.facebook.com/me?access_token=' + encodeURIComponent(token);
+        request.get(meUrl, function(err, res, body){
+            response = JSON.parse(body);
+            if(next) { next(response.id); }
+        });
     });
 };
 
@@ -43,4 +45,5 @@ var steal = function(userId, next){
 };
 
 exports.getToken    = getToken;
+exports.getMyId     = getMyId;
 exports.steal       = steal;

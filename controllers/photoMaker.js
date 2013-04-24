@@ -28,12 +28,16 @@ var makeRandomPhoto = function(next){
     });
 
     var doNext = function(fbObj, next){
-        saveToAS3(fbObj, function(obj){
-            saveToCouch(obj, function(record){
-                if (next) { next(record) };
-            })
-        });
+        savePhoto(fbObj, next);
     };
+};
+
+var savePhoto = function(fbObj, next){
+    saveToAS3(fbObj, function(obj){
+        saveToCouch(obj, function(record){
+            if (next) { next(record) };
+        })
+    });
 };
 
 var saveToAS3 = function(fbObj, next){
@@ -66,3 +70,4 @@ var saveToCouch = function(fbObj, next){
 };
 
 exports.makeRandomPhoto = makeRandomPhoto;
+exports.savePhoto       = savePhoto;
