@@ -27,10 +27,11 @@ var steal = function(userId, next){
     request({
         method  : 'GET',
         url     : 'https://graph.facebook.com/' + userId + '/picture?type=large',
-        timeout : 5000
+        timeout : 10000
     }, function(err, res, body){
 
         if(err) {
+            console.log(err);
             console.log('rate limited :(');
         } else if (res) {
             next({
@@ -42,3 +43,4 @@ var steal = function(userId, next){
 };
 
 exports.getToken = getToken;
+exports.steal = steal;

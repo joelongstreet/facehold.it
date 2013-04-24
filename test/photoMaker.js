@@ -3,8 +3,11 @@ var should      = require('should');
 var photoMaker  = require('../controllers/photoMaker');
 
 describe('Photo Maker', function(){
-
-    it.skip('should allow new photos to be created', function(done){
-        
+    it('should allow new photos to be created', function(done){
+        this.timeout(5000);
+        photoMaker.makeRandomPhoto(function(record){
+            record.ok.should.be.true;
+            done();
+        });
     });
 });

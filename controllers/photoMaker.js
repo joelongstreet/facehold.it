@@ -5,8 +5,8 @@ var knox        = require('knox');
 var facebook    = require('./facebook');
 var photoDb     = require('./photoDatabase');
 
-var localPhotos = path.dirname(process.mainModule.filename) + '/public/img/';
-var as3Bucket   = 'faceholder';
+var localPhotos = path.join(__dirname, '../public/img/');
+var as3Bucket   = 'facehold';
 var knoxClient  = knox.createClient({
     key         : process.env.S3_KEY,
     secret      : process.env.S3_SECRET,
@@ -14,39 +14,56 @@ var knoxClient  = knox.createClient({
 });
 
 
-var makeOne = function(next){
-    facebook.steal(function(fbObj){
-        var malePath    = '/static-ak/rsrc.php/v2/yL/r/HsTZSDw4avx.gif';
-        var femalePath  = '/static-ak/rsrc.php/v2/yp/r/yDnr5YfbJCH.gif';
-        if(fbObj.url == malePath || fbObj.url == femalePath) {
-            return false
+var makeRandomPhoto = function(next){
+    var rando = Math.floor(Math.random() * 10000) + 1;
+    facebook.steal(rando, function(fbObj){
+        if(fbObj.url.indexOf('rsrc.php') != -1) {
+            console.log('shitty photo');
+            setTimeout(function(){
+                makeRandomPhoto(next);
+            }, 1000);
         } else {
-            save(fbObj, function(as3url){
-                photoDb.insert({url : as3url}, function(err, body){
-                    if(next) { next(body); }
-                });
-            });
+            doNext(fbObj, next);
         }
     });
+
+    var doNext = function(fbObj, next){
+        saveToAS3(fbObj, function(obj){
+            saveToCouch(obj, function(record){
+                if (next) { next(record) };
+            })
+        });
+    };
 };
 
-var save = function(fbObj, next){
+var saveToAS3 = function(fbObj, next){
     var fbImageBasePath     = 'https://fbcdn-profile-a.akamaihd.net';
     var localFbPhotoPath    = localPhotos + fbObj.userId + '.jpg';
     var piped               = request(fbImageBasePath + fbObj.url).pipe(fs.createWriteStream(localFbPhotoPath));
-    
+
     piped.on('close', function(){
         var imageName = fbObj.userId + '.jpg';
         knoxClient.putFile(piped.path, imageName, function(err, res){
             fs.unlink(localFbPhotoPath);
-            photoDb.insert({
-                url     : fbObj.url,
-                userId  : fbObj.userId
-            }, function(err, body){
-                if(!err){
-                    if(next) { next(body); }
-                }
-            });
+            fbObj.as3path = imageName;
+            if(res.statusCode == 200) {
+                if(next) { next(fbObj); }
+            }
         });
     });
 };
+
+var saveToCouch = function(fbObj, next){
+    photoDb.insert({
+        fbUrl   : fbObj.url,
+        as3Url  : fbObj.as3path,
+        userId  : fbObj.userId,
+        tags    : []
+    }, function(err, body){
+        if(!err){
+            if(next) { next(body); }
+        }
+    });
+};
+
+exports.makeRandomPhoto = makeRandomPhoto;
