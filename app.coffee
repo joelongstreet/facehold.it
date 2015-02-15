@@ -3,7 +3,6 @@ path        = require 'path'
 stylus      = require 'stylus'
 redis       = require 'redis'
 bootstrap   = require 'bootstrap-stylus'
-nodefly     = require 'nodefly'
 config      = require './config'
 {Routes}    = require './controllers/Routes'
 {FB}        = require './controllers/Facebook'
@@ -15,8 +14,6 @@ app         = express()
 
 redis_client= redis.createClient(2586, '50.30.35.9')
 routes      = new Routes redis_client
-
-nodefly.profile 'f2d55ddfaa41a91e73af49670dd71675', ['Facehold.it', env.SUBDOMAIN]
 
 # --> Config
 app.use require('connect-assets')()

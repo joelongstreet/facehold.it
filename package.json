@@ -15,8 +15,7 @@
     "knox": "v0.0.9",
     "bootstrap-stylus": "v0.2.1",
     "nib": "v0.8.1",
-    "nodealytics": "https://github.com/skookum/nodealytics/tarball/master",
-    "nodefly": "stable"
+    "nodealytics": "https://github.com/skookum/nodealytics/tarball/master"
   },
   "scripts": {
     "start": "runner.js"
