@@ -2,11 +2,13 @@ fs                  = require 'fs'
 knox                = require 'knox'
 request             = require 'request'
 path                = require 'path'
+config              = require '../config'
+env                 = config()
 as3_bucket          = 'faceholder'
 local_photo_path    = "#{path.dirname(process.mainModule.filename)}/public/img"
 knox_client         = knox.createClient
-    key                 : process.env.S3_KEY
-    secret              : process.env.S3_SECRET
+    key                 : env.S3_KEY
+    secret              : env.S3_SECRET
     bucket              : as3_bucket
 
 
@@ -48,7 +50,7 @@ class exports.Facebook
         piped.on 'close', =>
             knox_client.putFile piped.path, "#{user_id}.jpg", (err, res) =>
                 if err then console.error 'error writing to s3 server', err
-                
+
                 # Delete the file From disk
                 fs.unlink "#{local_photo_path}/#{user_id}.jpg", (delete_err) ->
                     if delete_err then console.error 'could not clean up file', delete_err

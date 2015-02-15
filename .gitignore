@@ -15,5 +15,6 @@ node_modules
 npm-debug.log
 .DS_Store
 ENV_VARS
+env-vars.js
 
 public/fb_images/*.jpg

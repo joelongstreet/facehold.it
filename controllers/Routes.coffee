@@ -2,8 +2,10 @@ request     = require 'request'
 fs          = require 'fs'
 events      = require 'events'
 analytics   = require 'nodealytics'
+config      = require '../config'
 {Facebook}  = require './Facebook'
 {Photos}    = require './Photos'
+env         = config()
 
 
 class exports.Routes
@@ -14,8 +16,8 @@ class exports.Routes
         @fb_locales = JSON.parse(fs.readFileSync('./data/fb_locales.js','utf-8'))
         @analytics  = analytics.initialize 'UA-3920837-11', 'faceholdit.jit.su'
 
-        if process.env.GETPHOTOS
-            
+        if env.GETPHOTOS
+
             # Go Borrow Some Facebook Photos every so often
             setInterval (=>
                 rando = Math.floor(Math.random() * 1000000000) + 1
@@ -97,7 +99,7 @@ class exports.Routes
                 , (err, resp, body) =>
 
                     fb_body = JSON.parse(body)
-                   
+
                     locale == 'American'
                     for location in @fb_locales
                         if location.fb_code == fb_body.locale
