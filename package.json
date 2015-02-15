@@ -5,17 +5,18 @@
     "npm": "1.1.48"
   },
   "dependencies": {
-    "express": "v3.0.0rc4",
-    "coffee-script": "v1.2.0",
-    "jade": "v0.20.0",
-    "stylus": "v0.22.5",
-    "connect-assets": "v2.1.9",
-    "request": "v2.9.202",
-    "redis": "v0.7.2",
-    "knox": "v0.0.9",
     "bootstrap-stylus": "v0.2.1",
+    "coffee-script": "v1.2.0",
+    "connect-assets": "v2.1.9",
+    "express": "v3.0.0rc4",
+    "jade": "v0.20.0",
+    "knox": "v0.0.9",
     "nib": "v0.8.1",
-    "nodealytics": "https://github.com/skookum/nodealytics/tarball/master"
+    "nodealytics": "https://github.com/skookum/nodealytics/tarball/master",
+    "q": "^1.1.2",
+    "redis": "v0.7.2",
+    "request": "v2.9.202",
+    "stylus": "v0.22.5"
   },
   "scripts": {
     "start": "runner.js"

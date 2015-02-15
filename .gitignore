@@ -17,5 +17,5 @@ npm-debug.log
 ENV_VARS
 env-vars.js
 
-public/fb_images/*.jpg
+tmp/*.jpg
 todo.md

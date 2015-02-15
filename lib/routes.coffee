@@ -11,14 +11,6 @@ env         = config()
 fb_locales  = JSON.parse(fs.readFileSync('./data/fb_locales.js','utf-8'))
 analytics   = analytics.initialize 'UA-3920837-11', 'faceholdit.jit.su'
 
-if env.GETPHOTOS
-    # Go Borrow Some Facebook Photos every so often
-    setInterval (=>
-        rando = Math.floor(Math.random() * 1000000000) + 1
-        facebook.create rando, ->
-            return false
-    ), 1000
-
 
 exports.home = (req, res) =>
     if req.headers.referrer then res.redirect '/pic'
