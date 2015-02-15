@@ -18,3 +18,4 @@ ENV_VARS
 env-vars.js
 
 public/fb_images/*.jpg
+todo.md
