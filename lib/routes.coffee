@@ -4,6 +4,7 @@ analytics   = require 'nodealytics'
 config      = require '../config'
 facebook    = require './facebook'
 photos      = require './photos'
+cache       = require './cache'
 env         = config()
 
 
@@ -43,6 +44,12 @@ exports.add_me = (req, res) =>
           res.render 'new_user_added', user
       .reject (err) ->
           res.render 'error', { error : err }
+
+
+
+exports.count = (req, res) ->
+    cache.get_length().then (count) ->
+        res.send total_photo_count : count
 
 
 

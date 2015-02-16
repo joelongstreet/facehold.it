@@ -21,6 +21,7 @@ app.set 'view engine', 'jade'
 
 app.get '/', routes.home
 app.get '/pic', routes.pic
+app.get '/count', routes.count
 app.get '/:number', routes.number
 app.get '/add/me', routes.add_me
 app.get '/add/:fbid', routes.add_user
