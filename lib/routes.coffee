@@ -57,32 +57,3 @@ exports.number = (req, res) =>
 
 exports.get_user = (req, res) =>
     res.redirect "https://s3.amazonaws.com/faceholder/#{req.params.id}.jpg"
-
-
-
-exports.hubot = (req, res) =>
-    photos.count (err, count) =>
-        photos.make_random_url count, (err, id) =>
-
-            fb_req      = "https://graph.facebook.com/#{id}"
-
-            request
-                method  : 'GET'
-                url     : fb_req
-                timeout : 1500
-            , (err, resp, body) =>
-
-                fb_body = JSON.parse(body)
-
-                locale == 'American'
-                for location in fb_locales
-                    if location.fb_code == fb_body.locale
-                        locale = location.nationality
-
-                res.send
-                    id          : fb_body.id
-                    name        : fb_body.name
-                    gender      : fb_body.gender
-                    url         : fb_body.link
-                    nationality : locale
-                    image       : "https://s3.amazonaws.com/faceholder/#{id}.jpg"
