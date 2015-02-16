@@ -57,13 +57,13 @@ exports.save = (user) ->
     piped = request("#{user.url}")
       .pipe(fs.createWriteStream("#{local_photo_path}/#{user.id}.jpg"))
 
-    piped.on 'error', err ->
+    piped.on 'error', (err) ->
       deferred.reject(err)
 
     piped.on 'close', ->
       add_to_S3(piped.path, "#{user.id}.jpg").then (photo_url) ->
         fs.unlink "#{local_photo_path}/#{user.id}.jpg"
-        cache.add user_id
+        cache.add user.id
         console.log "added user #{user.id}"
         deferred.resolve
             id    : user.id
