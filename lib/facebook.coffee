@@ -1,5 +1,7 @@
 q         = require 'q'
 request   = require 'request'
+config    = require '../config'
+env       = config()
 
 
 
@@ -26,19 +28,29 @@ exports.pic_is_valid = (remote_path) ->
 
 
 
-exports.get_token = (next) ->
-    token_path = 'https://graph.facebook.com/oauth/access_token?client_id=437279489672493&client_secret=23b75697bade006a53a52bebf6d44b1e&grant_type=client_credentials'
+exports.get_token = ->
+    deferred = q.defer()
+    token_path = "https://graph.facebook.com/oauth/access_token?client_id=#{env.FACEBOOK_ID}&client_secret=#{env.FACEBOOK_SECRET}&grant_type=client_credentials"
 
     request.get token_path, (err, res, body) ->
-        if !err
+        if err then deferred.reject(err)
+        else
             token_parts = body.split('access_token=')
-            if next then next(token_parts[1])
+            deferred.resolve token_parts[1]
+
+    deferred.promise
 
 
 
-exports.get_my_id = (token, next) ->
-    me_url = "https://graph.facebook.com/me?access_token=#{encodeURIComponent(token)}"
+exports.get_my_id = (token) ->
+    deferred = q.defer()
+
+    me_url = "https://graph.facebook.com/me?access_token=#{token}"
     request.get me_url, (err, res, body) ->
-        response = JSON.parse(body)
-        console.log body
-        next(response.id)
+        if(err) then deferred.reject(err)
+        else
+          response = JSON.parse(body)
+          console.log(response)
+          deferred.resolve(response.id)
+
+    deferred.promise

@@ -35,13 +35,14 @@ exports.add_user = (req, res) =>
 
 
 exports.add_me = (req, res) =>
-    facebook.get_token (token) =>
-        facebook.get_my_id (token), (user_id) =>
-            facebook.create user_id, (err, data) ->
-                if err
-                    res.render 'error', {error : err}
-                else
-                    res.render 'new_user_added', { uid : data.user_id, path : data.as3_path }
+    facebook.get_token()
+      .then(facebook.get_my_id)
+      .then(facebook.get_user)
+      .then(photos.save)
+      .then (user) ->
+          res.render 'new_user_added', user
+      .reject (err) ->
+          res.render 'error', { error : err }
 
 
 

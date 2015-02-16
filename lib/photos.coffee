@@ -51,14 +51,22 @@ add_to_S3 = (local_path, remote_path) ->
     deferred.promise
 
 
-exports.save = (user_id, remote_path) ->
-    # write photo to disk
-    piped = request("#{remote_path}")
-      .pipe(fs.createWriteStream("#{local_photo_path}/#{user_id}.jpg"))
+exports.save = (user) ->
+    deferred = q.defer()
 
-    # notify redis + S3, delete local file
-    piped.on 'close', =>
-      add_to_S3(piped.path, "#{user_id}.jpg").then ->
-        fs.unlink "#{local_photo_path}/#{user_id}.jpg"
+    piped = request("#{user.url}")
+      .pipe(fs.createWriteStream("#{local_photo_path}/#{user.id}.jpg"))
+
+    piped.on 'error', err ->
+      deferred.reject(err)
+
+    piped.on 'close', ->
+      add_to_S3(piped.path, "#{user.id}.jpg").then (photo_url) ->
+        fs.unlink "#{local_photo_path}/#{user.id}.jpg"
         cache.add user_id
-        console.log "added user #{user_id}"
+        console.log "added user #{user.id}"
+        deferred.resolve
+            id    : user.id
+            url   : "https://s3.amazonaws.com/faceholder/#{user.id}.jpg"
+
+    deferred.promise
