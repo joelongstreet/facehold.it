@@ -1,6 +1,5 @@
 request     = require 'request'
 fs          = require 'fs'
-events      = require 'events'
 analytics   = require 'nodealytics'
 config      = require '../config'
 facebook    = require './facebook'
@@ -12,20 +11,18 @@ fb_locales  = JSON.parse(fs.readFileSync('./data/fb_locales.js','utf-8'))
 analytics   = analytics.initialize 'UA-3920837-11', 'faceholdit.jit.su'
 
 
+
 exports.home = (req, res) =>
     if req.headers.referrer then res.redirect '/pic'
     else res.redirect '/25'
 
 
+
 exports.pic = (req, res) =>
-    photos.count (err, count) =>
-        if err then res.render 'error', {error : err}
-        else
-            photos.make_random_url count, (err, id) =>
-                if err then res.render 'error', {error : err}
-                else
-                    @analytics.trackPage 'Picture', 'picture'
-                    res.redirect "https://s3.amazonaws.com/faceholder/#{id}.jpg"
+    photos.get_one (id) =>
+        res.redirect "https://s3.amazonaws.com/faceholder/#{id}.jpg"
+        # analytics.trackPage 'Picture', 'picture'
+
 
 
 exports.add_user = (req, res) =>
@@ -34,6 +31,7 @@ exports.add_user = (req, res) =>
             res.render 'error', {error : err}
         else
             res.render 'new_user_added', { uid : data.user_id, path : data.as3_path }
+
 
 
 exports.add_me = (req, res) =>
@@ -46,30 +44,19 @@ exports.add_me = (req, res) =>
                     res.render 'new_user_added', { uid : data.user_id, path : data.as3_path }
 
 
+
 exports.number = (req, res) =>
     if req.params.number > 100
         res.render 'max'
     else
-        photo_urls  = []
-        index       = 0
-        photos.count (err, count) =>
-            is_ready = new events.EventEmitter()
-            is_ready.once 'ready', ->
-                res.render 'photos', photos : photo_urls
+        photos.get_some(req.params.number).then (photo_urls) ->
+          res.render 'photos', photos : photo_urls
 
-            while index < req.params.number
-                photos.make_random_url count, (err, id) ->
-                    if err then console.log 'error fetching photo'
-                    else photo_urls.push id
-
-                    if photo_urls.length == req.params.number - 1
-                        is_ready.emit 'ready'
-
-                index++
 
 
 exports.get_user = (req, res) =>
     res.redirect "https://s3.amazonaws.com/faceholder/#{req.params.id}.jpg"
+
 
 
 exports.hubot = (req, res) =>
