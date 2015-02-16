@@ -19,7 +19,7 @@
     "stylus": "v0.22.5"
   },
   "scripts": {
-    "start": "runner.js"
+    "start": "node runner.js"
   },
   "name": "faceholdit",
   "subdomain": "faceholdit"
