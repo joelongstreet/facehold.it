@@ -21,6 +21,5 @@
   "scripts": {
     "start": "node runner.js"
   },
-  "name": "faceholdit",
-  "subdomain": "faceholdit"
+  "name": "faceholder"
 }
